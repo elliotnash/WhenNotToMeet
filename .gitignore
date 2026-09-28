@@ -1,0 +1,28 @@
+# dependencies
+node_modules
+
+# editors
+.vscode
+.idea
+
+# caches
+.turbo
+.tanstack
+.cache
+
+# build output
+dist
+.output
+
+# secrets / env
+.env
+.env.*
+!.env.example
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# os
+.DS_Store

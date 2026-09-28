@@ -1,0 +1,14 @@
+'use client';
+
+import { type ClassNameValue, cn } from 'cn';
+import { composeRenderProps } from 'react-aria-components/composeRenderProps';
+
+type Render<T> = string | ((v: T) => string) | undefined;
+
+export function cx<T = unknown>(
+  ...classes: [...ClassNameValue[], Render<T>]
+): string | ((v: T) => string) {
+  const className = classes.pop() as Render<T>;
+
+  return composeRenderProps(className, (className) => cn(classes, className));
+}
