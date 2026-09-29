@@ -10,15 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authResetPasswordRouteImport } from './routes/(auth)/reset-password'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardEventIdRouteImport } from './routes/dashboard/$eventId'
+import { Route as DashboardNewRouteImport } from './routes/dashboard/new'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRouteRoute = DashboardRouteRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
@@ -41,6 +50,21 @@ const authResetPasswordRoute = authResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardEventIdRoute = DashboardEventIdRouteImport.update({
+  id: '/$eventId',
+  path: '/$eventId',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardNewRoute = DashboardNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -49,10 +73,14 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/reset-password': typeof authResetPasswordRoute
+  '/dashboard/$eventId': typeof DashboardEventIdRoute
+  '/dashboard/new': typeof DashboardNewRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -61,25 +89,36 @@ export interface FileRoutesByTo {
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/reset-password': typeof authResetPasswordRoute
+  '/dashboard/$eventId': typeof DashboardEventIdRoute
+  '/dashboard/new': typeof DashboardNewRoute
+  '/dashboard': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteRouteWithChildren
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
   '/(auth)/reset-password': typeof authResetPasswordRoute
+  '/dashboard/$eventId': typeof DashboardEventIdRoute
+  '/dashboard/new': typeof DashboardNewRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/dashboard'
     | '/forgot-password'
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/dashboard/$eventId'
+    | '/dashboard/new'
+    | '/dashboard/'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -88,19 +127,27 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/dashboard/$eventId'
+    | '/dashboard/new'
+    | '/dashboard'
     | '/api/auth/$'
   id:
     | '__root__'
     | '/'
+    | '/dashboard'
     | '/(auth)/forgot-password'
     | '/(auth)/login'
     | '/(auth)/register'
     | '/(auth)/reset-password'
+    | '/dashboard/$eventId'
+    | '/dashboard/new'
+    | '/dashboard/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   authForgotPasswordRoute: typeof authForgotPasswordRoute
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
@@ -115,6 +162,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(auth)/forgot-password': {
@@ -145,6 +199,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/$eventId': {
+      id: '/dashboard/$eventId'
+      path: '/$eventId'
+      fullPath: '/dashboard/$eventId'
+      preLoaderRoute: typeof DashboardEventIdRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/new': {
+      id: '/dashboard/new'
+      path: '/new'
+      fullPath: '/dashboard/new'
+      preLoaderRoute: typeof DashboardNewRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -155,8 +230,25 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface DashboardRouteRouteChildren {
+  DashboardEventIdRoute: typeof DashboardEventIdRoute
+  DashboardNewRoute: typeof DashboardNewRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+}
+
+const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+  DashboardEventIdRoute: DashboardEventIdRoute,
+  DashboardNewRoute: DashboardNewRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+}
+
+const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
+  DashboardRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRouteRoute: DashboardRouteRouteWithChildren,
   authForgotPasswordRoute: authForgotPasswordRoute,
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
