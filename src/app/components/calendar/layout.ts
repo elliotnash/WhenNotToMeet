@@ -49,7 +49,7 @@ export function buildCalendarLayout(event: EventWindowConfig, timeZone: string):
   }
 
   const slots = (maxMinute - minMinute) / SLOT_MINUTES;
-  const slotPx = Math.min(24, Math.max(12, Math.round(600 / slots)));
+  const slotPx = Math.min(32, Math.max(12, Math.round(600 / slots)));
 
   return { timeZone, windows, windowsByDay, weeks, isSingleDay, minMinute, maxMinute, slotPx };
 }
