@@ -17,6 +17,7 @@ import { createFileRoute, notFound, useLocation } from '@tanstack/react-router';
 import { useState } from 'react';
 import { z } from 'zod';
 import { AppHeader } from '~/components/app-header';
+import { ConfirmModal } from '~/components/confirm-modal';
 import { EventCalendar } from '~/components/event-calendar';
 import { m, riseItem, staggerParent } from '~/components/motion';
 import { describeDates, describeTimeZone, describeWindow } from '~/lib/event-format';
@@ -225,6 +226,8 @@ function EventWorkspace({ token, view }: { token: string; view: EventView }) {
     onSuccess: refresh,
   });
   const me = view.me as NonNullable<EventView['me']>;
+  const [isDirty, setIsDirty] = useState(false);
+  const [confirmSwitch, setConfirmSwitch] = useState(false);
 
   return (
     <main className="flex flex-1 flex-col gap-4 px-4 py-6 sm:px-6">
@@ -243,7 +246,7 @@ function EventWorkspace({ token, view }: { token: string; view: EventView }) {
             intent="outline"
             size="sm"
             isPending={leave.isPending}
-            onPress={() => leave.mutate()}
+            onPress={() => (isDirty ? setConfirmSwitch(true) : leave.mutate())}
           >
             <ArrowRightStartOnRectangleIcon />
             Switch person
@@ -259,7 +262,22 @@ function EventWorkspace({ token, view }: { token: string; view: EventView }) {
           ) : null}
         </div>
       </div>
-      <EventCalendar token={token} event={view.event} />
+      <EventCalendar
+        key={me.id}
+        token={token}
+        event={view.event}
+        hasResponded={me.hasResponded}
+        onDirtyChange={setIsDirty}
+      />
+      <ConfirmModal
+        isOpen={confirmSwitch}
+        onOpenChange={setConfirmSwitch}
+        title="Discard unsaved changes?"
+        description="Your schedule changes haven't been saved."
+        confirmLabel="Discard and switch"
+        isPending={leave.isPending}
+        onConfirm={() => leave.mutate()}
+      />
     </main>
   );
 }
