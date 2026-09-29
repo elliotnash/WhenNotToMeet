@@ -31,7 +31,12 @@ function RegisterPage() {
     event.preventDefault();
     setError(null);
     setPending(true);
-    const { error } = await authClient.signUp.email({ name, email, password });
+    const { error } = await authClient.signUp.email({
+      name,
+      email,
+      password,
+      callbackURL: redirect,
+    });
     setPending(false);
     if (error) {
       setError(error.message ?? 'Unable to create account');

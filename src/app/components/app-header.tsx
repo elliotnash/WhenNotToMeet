@@ -2,6 +2,7 @@ import { Button, buttonStyles } from '@/components/ui/button';
 import { Link } from '@/components/ui/link';
 import { Menu, MenuContent, MenuHeader, MenuItem, MenuSection } from '@/components/ui/menu';
 import { MoonIcon, SunIcon, UserCircleIcon } from '@heroicons/react/20/solid';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
 import { useTheme } from '~/components/theme';
@@ -20,9 +21,11 @@ export function AppHeader({ children }: { children?: ReactNode }) {
   const { isAuthenticated, user } = useAuth();
   const theme = useTheme();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const signOut = async () => {
     await authClient.signOut();
+    await queryClient.invalidateQueries({ queryKey: ['auth'] });
     await router.invalidate();
     router.navigate({ to: '/' });
   };

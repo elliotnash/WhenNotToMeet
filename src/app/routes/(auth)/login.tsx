@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Link } from '@/components/ui/link';
 import { Loader } from '@/components/ui/loader';
 import { TextField } from '@/components/ui/text-field';
+import { useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { z } from 'zod';
@@ -21,6 +22,7 @@ export const Route = createFileRoute('/(auth)/login')({
 function LoginPage() {
   const { redirect } = Route.useSearch();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +38,8 @@ function LoginPage() {
       setError(error.message ?? 'Unable to sign in');
       return;
     }
-    navigate({ to: redirect });
+    await queryClient.invalidateQueries({ queryKey: ['auth'] });
+    navigate({ href: redirect });
   };
 
   return (
