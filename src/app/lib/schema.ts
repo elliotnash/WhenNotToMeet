@@ -1,4 +1,14 @@
-import { boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { relations, sql } from 'drizzle-orm';
+import {
+  boolean,
+  date,
+  index,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+} from 'drizzle-orm/pg-core';
 
 // Core Better Auth tables. Keep JS field names in sync with Better Auth's model
 // fields; run `pnpm db:generate` after any change here.
@@ -53,4 +63,88 @@ export const verification = pgTable('verification', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
 
-export const schema = { user, session, account, verification };
+export const event = pgTable(
+  'event',
+  {
+    id: text('id').primaryKey(),
+    ownerId: text('owner_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    title: text('title').notNull(),
+    description: text('description'),
+    token: text('token').notNull().unique(),
+    timezone: text('timezone').notNull(),
+    startDate: date('start_date', { mode: 'string' }).notNull(),
+    endDate: date('end_date', { mode: 'string' }).notNull(),
+    dayStartMinute: integer('day_start_minute').notNull(),
+    dayEndMinute: integer('day_end_minute').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  },
+  (t) => [index('event_owner_idx').on(t.ownerId)],
+);
+
+export const participant = pgTable(
+  'participant',
+  {
+    id: text('id').primaryKey(),
+    eventId: text('event_id')
+      .notNull()
+      .references(() => event.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }),
+    passwordHash: text('password_hash'),
+    respondedAt: timestamp('responded_at'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex('participant_event_user_idx').on(t.eventId, t.userId),
+    uniqueIndex('participant_event_guest_name_idx')
+      .on(t.eventId, sql`lower(${t.name})`)
+      .where(sql`${t.userId} is null`),
+  ],
+);
+
+export const busyBlock = pgTable(
+  'busy_block',
+  {
+    id: text('id').primaryKey(),
+    participantId: text('participant_id')
+      .notNull()
+      .references(() => participant.id, { onDelete: 'cascade' }),
+    startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
+    endsAt: timestamp('ends_at', { withTimezone: true }).notNull(),
+  },
+  (t) => [index('busy_block_participant_idx').on(t.participantId)],
+);
+
+export const eventRelations = relations(event, ({ many }) => ({
+  participants: many(participant),
+}));
+
+export const participantRelations = relations(participant, ({ one, many }) => ({
+  event: one(event, { fields: [participant.eventId], references: [event.id] }),
+  user: one(user, { fields: [participant.userId], references: [user.id] }),
+  busyBlocks: many(busyBlock),
+}));
+
+export const busyBlockRelations = relations(busyBlock, ({ one }) => ({
+  participant: one(participant, {
+    fields: [busyBlock.participantId],
+    references: [participant.id],
+  }),
+}));
+
+export const schema = {
+  user,
+  session,
+  account,
+  verification,
+  event,
+  participant,
+  busyBlock,
+  eventRelations,
+  participantRelations,
+  busyBlockRelations,
+};
