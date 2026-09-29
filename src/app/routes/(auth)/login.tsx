@@ -38,7 +38,7 @@ function LoginPage() {
       setError(error.message ?? 'Unable to sign in');
       return;
     }
-    await queryClient.invalidateQueries({ queryKey: ['auth'] });
+    await queryClient.invalidateQueries();
     navigate({ href: redirect });
   };
 

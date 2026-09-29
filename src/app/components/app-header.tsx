@@ -25,7 +25,7 @@ export function AppHeader({ children }: { children?: ReactNode }) {
 
   const signOut = async () => {
     await authClient.signOut();
-    await queryClient.invalidateQueries({ queryKey: ['auth'] });
+    await queryClient.invalidateQueries();
     await router.invalidate();
     router.navigate({ to: '/' });
   };
