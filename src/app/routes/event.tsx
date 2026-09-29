@@ -17,6 +17,7 @@ import { createFileRoute, notFound, useLocation } from '@tanstack/react-router';
 import { useState } from 'react';
 import { z } from 'zod';
 import { AppHeader } from '~/components/app-header';
+import { EventCalendar } from '~/components/event-calendar';
 import { m, riseItem, staggerParent } from '~/components/motion';
 import { describeDates, describeTimeZone, describeWindow } from '~/lib/event-format';
 import { cn } from '~/lib/utils';
@@ -258,6 +259,7 @@ function EventWorkspace({ token, view }: { token: string; view: EventView }) {
           ) : null}
         </div>
       </div>
+      <EventCalendar token={token} event={view.event} />
     </main>
   );
 }
